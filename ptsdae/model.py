@@ -9,7 +9,6 @@ from ptsdae.dae import DenoisingAutoencoder
 from ptsdae.sdae import StackedDenoisingAutoEncoder
 from ptsdae.utils import SimpleDataset
 
-
 def train(dataset: torch.utils.data.Dataset,
           autoencoder: torch.nn.Module,
           epochs: int,
@@ -35,6 +34,7 @@ def train(dataset: torch.utils.data.Dataset,
     :param batch_size: batch size for training
     :param optimizer: optimizer to use
     :param scheduler: scheduler to use, or None to disable, defaults to None
+    :param num_workers: number of workers to use in DataLoader
     :param corruption: proportion of masking corruption to apply, set to None to disable, defaults to None
     :param validation: instance of Dataset to use for validation, set to None to disable, defaults to None
     :param cuda: whether CUDA is used, defaults to True
@@ -113,7 +113,8 @@ def train(dataset: torch.utils.data.Dataset,
                     batch_size,
                     cuda=cuda,
                     silent=True,
-                    encode=False
+                    encode=False,
+                    num_workers=num_workers
                 )
                 validation_inputs = []
                 for val_batch in validation_loader:
@@ -176,6 +177,7 @@ def pretrain(dataset,
     :param batch_size: batch size for training
     :param corruption: proportion of masking corruption to apply, set to None to disable, defaults to None
     :param optimizer: function taking model and returning optimizer
+    :param num_workers: number of workers to use in DataLoader
     :param scheduler: function taking optimizer and returning scheduler, or None to disable
     :param validation: instance of Dataset to use for validation
     :param cuda: whether CUDA is used, defaults to True
@@ -234,7 +236,8 @@ def pretrain(dataset,
                     sub_autoencoder,
                     batch_size,
                     cuda=cuda,
-                    silent=silent
+                    silent=silent,
+                    num_workers=num_workers
                 )
             )
             current_validation = SimpleDataset(
@@ -243,7 +246,8 @@ def pretrain(dataset,
                     sub_autoencoder,
                     batch_size,
                     cuda=cuda,
-                    silent=silent
+                    silent=silent,
+                    num_workers=num_workers
                 )
             )
         else:
@@ -257,7 +261,8 @@ def predict(
         batch_size: int,
         cuda: bool = True,
         silent: bool = False,
-        encode: bool = True) -> torch.Tensor:
+        encode: bool = True,
+        num_workers: Optional[int] = 0) -> torch.Tensor:
     """
     Given a dataset, run the model in evaluation mode with the inputs in batches and concatenate the
     output.
@@ -268,6 +273,7 @@ def predict(
     :param cuda: whether CUDA is used, defaults to True
     :param silent: set to True to prevent printing out summary statistics, defaults to False
     :param encode: whether to encode or use the full autoencoder
+    :param num_workers: number of workers to use in DataLoader
     :return: predicted features from the Dataset
     """
     dataloader = DataLoader(
