@@ -84,7 +84,7 @@ def train(dataset: torch.utils.data.Dataset,
             if (isinstance(batch, tuple) or isinstance(batch, list)) and len(batch) == 2:
                 batch, _ = batch  # if we have a prediction label, strip it away
             if cuda:
-                batch = batch.cuda(async=True)
+                batch = batch.cuda(non_blocking=True)
             batch = batch.squeeze(1).view(batch.size(0), -1)
             # run the batch through the autoencoder and obtain the output
             if corruption is not None:
@@ -120,8 +120,8 @@ def train(dataset: torch.utils.data.Dataset,
                         validation_inputs.append(val_batch)
                 validation_actual = torch.cat(validation_inputs)
                 if cuda:
-                    validation_actual = validation_actual.cuda(async=True)
-                    validation_output = validation_output.cuda(async=True)
+                    validation_actual = validation_actual.cuda(non_blocking=True)
+                    validation_output = validation_output.cuda(non_blocking=True)
                 validation_loss = loss_function(validation_output, validation_actual)
                 # validation_accuracy = pretrain_accuracy(validation_output, validation_actual)
                 validation_loss_value = float(validation_loss.item())
@@ -284,7 +284,7 @@ def predict(
         if (isinstance(batch, tuple) or isinstance(batch, list)) and len(batch) == 2:
             batch, value = batch  # if we have a prediction label strip it away
         if cuda:
-            batch = batch.cuda(async=True)
+            batch = batch.cuda(non_blocking=True)
         batch = batch.squeeze(1).view(batch.size(0), -1)
         if encode:
             output = model.encode(batch)
