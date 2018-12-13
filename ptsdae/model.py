@@ -16,6 +16,7 @@ def train(dataset: torch.utils.data.Dataset,
           batch_size: int,
           optimizer: torch.optim.Optimizer,
           scheduler: Any = None,
+          num_workers: Optional[int] = 0,
           validation: Optional[torch.utils.data.Dataset] = None,
           corruption: Optional[float] = None,
           cuda: bool = True,
@@ -46,6 +47,7 @@ def train(dataset: torch.utils.data.Dataset,
     """
     dataloader = DataLoader(
         dataset,
+        num_workers=num_workers,
         batch_size=batch_size,
         pin_memory=False,
         sampler=sampler,
@@ -54,6 +56,7 @@ def train(dataset: torch.utils.data.Dataset,
     if validation is not None:
         validation_loader = DataLoader(
             validation,
+            num_workers=num_workers,
             batch_size=batch_size,
             pin_memory=False,
             sampler=None,
@@ -152,6 +155,7 @@ def pretrain(dataset,
              epochs: int,
              batch_size: int,
              optimizer: Callable[[torch.nn.Module], torch.optim.Optimizer],
+             num_workers: Optional[int] = 0,
              scheduler: Optional[Callable[[torch.nn.Module], Any]] = None,
              validation: Optional[torch.utils.data.Dataset] = None,
              corruption: Optional[float] = None,
@@ -209,6 +213,7 @@ def pretrain(dataset,
             epochs,
             batch_size,
             ae_optimizer,
+            num_workers=num_workers,
             validation=current_validation,
             corruption=None,  # already have dropout in the DAE
             scheduler=ae_scheduler,
@@ -267,6 +272,7 @@ def predict(
     """
     dataloader = DataLoader(
         dataset,
+        num_workers=num_workers,
         batch_size=batch_size,
         pin_memory=False,
         shuffle=False
