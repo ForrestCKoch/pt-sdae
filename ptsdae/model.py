@@ -83,6 +83,7 @@ def train(dataset: torch.utils.data.Dataset,
             disable=silent,
         )
         for index, batch in enumerate(data_iterator):
+            batch = torch.autograd.Variable(batch)
             # unpack the batch if its consists of a (feature, prediction) tuple or list
             if (isinstance(batch, tuple) or isinstance(batch, list)) and len(batch) == 2:
                 batch, _ = batch  # if we have a prediction label, strip it away
@@ -90,7 +91,7 @@ def train(dataset: torch.utils.data.Dataset,
                 batch = batch[0]
 
             if cuda:
-                batch = batch.cuda(non_blocking=True)
+                batch = batch.cuda(async=True)
             batch = batch.squeeze(1).view(batch.size(0), -1)
             # run the batch through the autoencoder and obtain the output
             if corruption is not None:
@@ -99,7 +100,7 @@ def train(dataset: torch.utils.data.Dataset,
                 output = autoencoder(batch)
             loss = loss_function(output, batch)
             # accuracy = pretrain_accuracy(output, batch)
-            loss_value = float(loss.item())
+            loss_value = float(loss)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step(closure=None)
@@ -129,11 +130,11 @@ def train(dataset: torch.utils.data.Dataset,
                         validation_inputs.append(val_batch)
                 validation_actual = torch.cat(validation_inputs)
                 if cuda:
-                    validation_actual = validation_actual.cuda(non_blocking=True)
-                    validation_output = validation_output.cuda(non_blocking=True)
+                    validation_actual = validation_actual.cuda(async=True)
+                    validation_output = validation_output.cuda(async=True)
                 validation_loss = loss_function(validation_output, validation_actual)
                 # validation_accuracy = pretrain_accuracy(validation_output, validation_actual)
-                validation_loss_value = float(validation_loss.item())
+                validation_loss_value = float(validation_loss)
                 data_iterator.set_postfix(
                     epo=epoch,
                     lss='%.6f' % loss_value,
@@ -301,12 +302,13 @@ def predict(
     if isinstance(model, torch.nn.Module):
         model.eval()
     for index, batch in enumerate(data_iterator):
+        batch = torch.autograd.Variable(batch)
         if (isinstance(batch, tuple) or isinstance(batch, list)) and len(batch) == 2:
             batch, value = batch  # if we have a prediction label strip it away
         elif (isinstance(batch, tuple) or isinstance(batch, list)) and len(batch) == 1:
             batch = batch[0]
         if cuda:
-            batch = batch.cuda(non_blocking=True)
+            batch = batch.cuda(async=True)
         batch = batch.squeeze(1).view(batch.size(0), -1)
         if encode:
             output = model.encode(batch)

@@ -57,8 +57,8 @@ class DenoisingAutoencoder(nn.Module):
         :param gain: gain for use in initialiser
         :return: None
         """
-        nn.init.xavier_uniform_(weight, gain)
-        nn.init.constant_(bias, 0)
+        nn.init.xavier_uniform(weight, gain)
+        nn.init.constant(bias, 0)
 
     def copy_weights(self, encoder: torch.nn.Linear, decoder: torch.nn.Linear) -> None:
         """
@@ -86,4 +86,5 @@ class DenoisingAutoencoder(nn.Module):
         return F.linear(batch, self.decoder_weight, self.decoder_bias)
 
     def forward(self, batch: torch.Tensor) -> torch.Tensor:
+        #batch = torch.autograd.Variable(batch)
         return self.decode(self.encode(batch))

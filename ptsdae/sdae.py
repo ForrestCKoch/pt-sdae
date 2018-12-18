@@ -35,8 +35,8 @@ def default_initialise_weight_bias_(weight: torch.Tensor, bias: torch.Tensor, ga
     :param gain: gain for use in initialiser
     :return: None
     """
-    nn.init.xavier_uniform_(weight, gain)
-    nn.init.constant_(bias, 0)
+    nn.init.xavier_uniform(weight, gain)
+    nn.init.constant(bias, 0)
 
 
 class StackedDenoisingAutoEncoder(nn.Module):
