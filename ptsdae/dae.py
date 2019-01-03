@@ -69,10 +69,10 @@ class DenoisingAutoencoder(nn.Module):
         :param decoder: decoder Linear unit
         :return: None
         """
-        encoder.weight.data.copy_(self.encoder_weight)
-        encoder.bias.data.copy_(self.encoder_bias)
-        decoder.weight.data.copy_(self.decoder_weight)
-        decoder.bias.data.copy_(self.decoder_bias)
+        encoder.weight.data.copy_(self.encoder_weight.data)
+        encoder.bias.data.copy_(self.encoder_bias.data)
+        decoder.weight.data.copy_(self.decoder_weight.data)
+        decoder.bias.data.copy_(self.decoder_bias.data)
 
     def encode(self, batch: torch.Tensor) -> torch.Tensor:
         transformed = F.linear(batch, self.encoder_weight, self.encoder_bias)
