@@ -122,6 +122,7 @@ def train(dataset: torch.utils.data.Dataset,
                 )
                 validation_inputs = []
                 for val_batch in validation_loader:
+                    val_batch = torch.autograd.Variable(val_batch)
                     if (isinstance(val_batch, tuple) or isinstance(val_batch, list)) and len(val_batch) == 2:
                         validation_inputs.append(val_batch[0])
                     elif (isinstance(val_batch, tuple) or isinstance(val_batch, list)) and len(val_batch) == 1:
