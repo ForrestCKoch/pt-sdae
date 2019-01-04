@@ -314,5 +314,5 @@ def predict(
             output = model.encode(batch)
         else:
             output = model(batch)
-        features.append(output.detach().cpu())  # move to the CPU to prevent out of memory on the GPU
+        features.append(output.detach().cpu().data)  # move to the CPU to prevent out of memory on the GPU
     return torch.cat(features)
